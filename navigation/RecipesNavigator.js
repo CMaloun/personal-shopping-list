@@ -14,6 +14,7 @@ const RecipesNavigator = createStackNavigator(
     RecipeDetail: RecipeDetailScreen,
     NewRecipe: NewRecipeScreen,
     Map: MapScreen
+    
   },
   {
     defaultNavigationOptions: {
