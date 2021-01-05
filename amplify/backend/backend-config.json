@@ -1,0 +1,24 @@
+{
+  "auth": {
+    "native02basescreensebcde9be1": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  },
+  "predictions": {
+    "identifyText749d913f": {
+      "providerPlugin": "awscloudformation",
+      "service": "Rekognition",
+      "dependsOn": [],
+      "identifyType": "identifyText"
+    }
+  },
+  "storage": {
+    "s3d583f39d": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation"
+    }
+  }
+}
