@@ -1,0 +1,8 @@
+type RecipeIdentification @model {
+  id: ID!
+  s3Key: String!
+  title: String
+  imageUri: String!
+  FileSystemPath: String!
+  description: String
+}

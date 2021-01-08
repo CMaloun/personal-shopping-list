@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { View, Button, Image, Text, StyleSheet, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
+import * as ImagePicker2 from 'expo-image-picker'
 import Amplify, {
   Storage, Predictions
 } from "aws-amplify";
@@ -29,6 +30,7 @@ const ImgPicker = props => {
     if (!hasPermission) {
         return;
     }
+    setPickedImage(null);
     const image = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [16, 9],
@@ -38,25 +40,40 @@ const ImgPicker = props => {
     });
 
     setPickedImage(image.uri);
-    props.onImageTaken(image.uri);
+    console.log(image.uri);
+    
+
     const response = await fetch(image.uri);
     const blob = await response.blob();
-    const s3photo = await Storage.put("file-" + Date.now() + ".jpeg", blob, {
+    await Storage.put("file-" + Date.now() + ".jpeg", blob, {
       contentType: "image/jpeg"
+    }).then(s3photo => props.onImageTaken(image.uri, s3photo.key))
+    .catch(err => console.log(err));
+  };
+  const pickImage = async () => {
+    setPickedImage(null);
+    let result = await ImagePicker2.launchImageLibraryAsync({
+      mediaTypes: ImagePicker2.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      base64: true,
+      exif: true
     });
+    if (result.cancelled) {
+      console.log("No image picked")
+      return;
+    }
+    console.log(result.uri);
+    setPickedImage(result.uri);
+    const response = await fetch(result.uri);
+    const blob = await response.blob();
+    await Storage.put("file-" + Date.now() + ".jpeg", blob, {
+      contentType: "image/jpeg"
+    }).then(s3photo => props.onImageTaken(result.uri, s3photo.key))
+    .catch(err => console.log(err));
+    console.log(result.uri);
 
-    await Predictions.identify({
-      text: {
-        source: {
-          key: s3photo.key,
-          level: "public" //optional, default is the configured on Storage category
-        },
-        format: "PLAIN" // Available options "PLAIN", "FORM", "TABLE", "ALL"
-      }
-    }).then(response => console.log(response)).catch(err => console.log(err));
-
-      
-    
   };
 
   return (
@@ -64,7 +81,9 @@ const ImgPicker = props => {
       <View style={styles.imagePreview}>
         {!pickedImage ? (<Text>No image picked yet.</Text>):(
         <Image style={styles.image} source={{uri: pickedImage}}/>)}
+        
       </View>
+      <Button title="Pick an image from camera roll" onPress={pickImage} />
       <Button
         title="Take Image"
         color={Colors.primary}

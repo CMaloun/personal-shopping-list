@@ -10,7 +10,7 @@ export default (state = initialState, action) => {
     case SET_RECIPES:
       return {
         recipes: action.recipes.map(
-          recipe => new Recipe(recipe.id.toString(), recipe.title, recipe.imageUri)
+          recipe => new Recipe(recipe.id.toString(), recipe.title, recipe.FileSystemPath, recipe.description, recipe.s3Key)
         )
       };
     case ADD_RECIPE:
