@@ -56,12 +56,15 @@ export const addRecipe = (title,image, s3Key) => {
         },
         format: "PLAIN" // Available options "PLAIN", "FORM", "TABLE", "ALL"
       }
-    }).then(async response => {await API.graphql(
+    }).then(async response => {
+        console.log(response.text.lines);
+        await API.graphql(
       graphqlOperation(updateRecipeIdentification, {
         input: {
           id: creationRecipe.data.createRecipeIdentification.id,
-          description : response.text.fullText
-        }}));})
+          description : response.text.lines
+        }}));
+      })
     .catch(err => console.log(err));
   
         
